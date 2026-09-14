@@ -1084,7 +1084,6 @@ export default function App() {
             <TextInput ref={loginInputRef} value={mpin} onChangeText={handleMpinChange} keyboardType="number-pad" maxLength={6} style={styles.hiddenInput} autoFocus={true} />
             
             <View style={styles.rowBetweenWidth}>
-              <Text style={styles.demoCredentialHint}>Demo mPIN: <Text style={styles.bold}>189198</Text></Text>
               <TouchableOpacity style={styles.forgotBtn}><Text style={styles.forgotText}>Forgot mPIN?</Text></TouchableOpacity>
             </View>
 
