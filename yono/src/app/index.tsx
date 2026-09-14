@@ -22,9 +22,54 @@ import {
 
 const { width } = Dimensions.get('window');
 
-const YONO_SBI_LOGO_URI = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80"><defs><linearGradient id="sbiGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2300A1E1"/><stop offset="100%" stop-color="%230077B5"/></linearGradient></defs><circle cx="40" cy="40" r="32" fill="url(%23sbiGrad)"/><rect x="36" y="40" width="8" height="22" fill="%2370006B"/><circle cx="40" cy="40" r="8" fill="%2370006B"/><text x="88" y="48" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="34" fill="%23FFFFFF" letter-spacing="-0.5">yono</text><text x="180" y="48" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="24" fill="%2300A1E1" letter-spacing="1">SBI</text></svg>';
+const SbiLogo = ({ size = 'medium', dark = false }: { size?: 'small' | 'medium' | 'large'; dark?: boolean }) => {
+  const scale = size === 'small' ? 0.65 : size === 'large' ? 1.3 : 1;
+  const outerRadius = 20 * scale;
+  const innerRadius = 5.5 * scale;
+  const barWidth = 6.5 * scale;
+  const barHeight = 20 * scale;
+  const fontSize = size === 'small' ? 18 : size === 'large' ? 36 : 26;
+  const sbiFontSize = size === 'small' ? 15 : size === 'large' ? 28 : 20;
 
-const YONO_SBI_LOGO_DARK_URI = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 80" width="280" height="80"><defs><linearGradient id="sbiGrad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%2300A1E1"/><stop offset="100%" stop-color="%230077B5"/></linearGradient></defs><circle cx="40" cy="40" r="32" fill="url(%23sbiGrad2)"/><rect x="36" y="40" width="8" height="22" fill="%23FFFFFF"/><circle cx="40" cy="40" r="8" fill="%23FFFFFF"/><text x="88" y="48" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="34" fill="%2370006B" letter-spacing="-0.5">yono</text><text x="180" y="48" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-weight="800" font-size="24" fill="%2300A1E1" letter-spacing="1">SBI</text></svg>';
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{
+        width: outerRadius * 2,
+        height: outerRadius * 2,
+        borderRadius: outerRadius,
+        backgroundColor: '#00A1E1',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <View style={{
+          width: innerRadius * 2,
+          height: innerRadius * 2,
+          borderRadius: innerRadius,
+          backgroundColor: dark ? '#FFF' : '#70006B',
+          position: 'absolute'
+        }} />
+        <View style={{
+          width: barWidth,
+          height: barHeight,
+          backgroundColor: dark ? '#FFF' : '#70006B',
+          position: 'absolute',
+          bottom: 0
+        }} />
+      </View>
+      <Text style={{
+        marginLeft: 8 * scale,
+        fontSize: fontSize,
+        fontWeight: '900',
+        color: dark ? '#70006B' : '#FFF',
+        letterSpacing: -0.5
+      }}>
+        yono <Text style={{ color: '#00A1E1', fontWeight: '800', fontSize: sbiFontSize }}>SBI</Text>
+      </Text>
+    </View>
+  );
+};
 
 type Screen =
   | 'splash'
@@ -264,11 +309,7 @@ export default function App() {
       <LinearGradient colors={['#4A004C', '#70006B', '#8E0A78']} style={styles.splashBackground}>
         <StatusBar barStyle="light-content" />
         <View style={styles.splashContent}>
-          <Image 
-            source={{ uri: YONO_SBI_LOGO_URI }} 
-            style={styles.logoSplash} 
-            resizeMode="contain" 
-          />
+          <SbiLogo size="large" />
           <Text style={styles.splashTagline}>For You. For India.</Text>
         </View>
         <View style={styles.splashFooter}>
@@ -848,7 +889,7 @@ export default function App() {
             <Text style={styles.selectAccountLabel}>Select Account</Text>
             <View style={styles.accountBox}>
               <View style={styles.sbiIconCircle}>
-                <Image source={{ uri: YONO_SBI_LOGO_DARK_URI }} style={styles.sbiMiniLogo} resizeMode="contain" />
+                <SbiLogo size="small" dark />
               </View>
               <View style={styles.flex1}>
                 <View style={styles.row}>
@@ -1063,7 +1104,7 @@ export default function App() {
             </View>
           </View>
           <View style={styles.headerRight}>
-             <Image source={{ uri: YONO_SBI_LOGO_URI }} style={styles.logoSmall} resizeMode="contain" />
+             <SbiLogo size="small" />
               <TouchableOpacity style={styles.locateRow}>
                 <Ionicons name="location-sharp" size={13} color="#FFF" />
                 <Text style={styles.locateText}> Locate Us</Text>
@@ -1084,7 +1125,6 @@ export default function App() {
             <TextInput ref={loginInputRef} value={mpin} onChangeText={handleMpinChange} keyboardType="number-pad" maxLength={6} style={styles.hiddenInput} autoFocus={true} />
             
             <View style={styles.rowBetweenWidth}>
-              <Text style={styles.demoCredentialHint}>Demo mPIN: <Text style={styles.bold}>189198</Text></Text>
               <TouchableOpacity style={styles.forgotBtn}><Text style={styles.forgotText}>Forgot mPIN?</Text></TouchableOpacity>
             </View>
 
