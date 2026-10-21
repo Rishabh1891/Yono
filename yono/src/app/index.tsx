@@ -96,41 +96,61 @@ interface Transaction {
   month: 'September 2026' | 'August 2026' | 'July 2026' | 'June 2026';
 }
 
-const PDF_TRANSACTIONS: Transaction[] = [
+// Monetary calculations use integer paise to avoid floating-point rounding drift.
+const CURRENT_BALANCE_PAISE = 9125784931;
+const formatPaise = (paise: number) => (paise / 100).toLocaleString('en-IN', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const CURRENT_BALANCE = formatPaise(CURRENT_BALANCE_PAISE);
+const parsePaise = (amount: string) => {
+  const [rupees, paise = ''] = amount.replace(/,/g, '').split('.');
+  return Number(rupees) * 100 + Number(paise.padEnd(2, '0'));
+};
+
+const TRANSACTION_HISTORY: Omit<Transaction, 'balance'>[] = [
   // September 2026 (Statement Batch)
-  { title: 'Mr Archana', subtitle: 'WDL TFR UPI/DR/508660462095/Mr archana/IDIB/7838953936/UPI 0097694162092 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '03/09/2026', amount: '20,500.00', balance: '14,84,145.22', isCredit: false, month: 'September 2026' },
-  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/657489321564/Air India SBI/R825607848/NEFT AT 00614 NEW DELHI', date: '02/09/2026', postDate: '02/09/2026', amount: '3,02,457.33', balance: '15,04,645.22', isCredit: true, month: 'September 2026' },
-  { title: 'Dinesh K', subtitle: 'WDL TFR UPI/DR/508728059523/DINESH K/BKID/q274255738/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '49,656.00', balance: '14,34,489.22', isCredit: false, month: 'September 2026' },
-  { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508739893393/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '4,000.00', balance: '14,34,039.22', isCredit: false, month: 'September 2026' },
-  { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508749980074/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '35,200.00', balance: '13,98,839.22', isCredit: false, month: 'September 2026' },
-  { title: 'Akanksha', subtitle: 'WDL TFR UPI/DR/508709195394/akanksha/ICIC/akankshash/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '500.00', balance: '13,98,339.22', isCredit: false, month: 'September 2026' },
-  { title: 'Rishabh', subtitle: 'WDL TFR UPI/DR/508700699588/rishabht/ICIC/rishabhtri/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '1,000.00', balance: '13,97,339.22', isCredit: false, month: 'September 2026' },
-  { title: 'Ms Sonia', subtitle: 'WDL TFR UPI/DR/545432776302/Ms SONIA/CBIN/sonia.onep/UPI 0097696162090 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '290.00', balance: '13,97,049.22', isCredit: false, month: 'September 2026' },
-  { title: 'Ms Sonia', subtitle: 'WDL TFR UPI/DR/509045593850/Ms SONIA/CBIN/sonia.onep/UPI 0097691162095 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '1,800.00', balance: '13,95,539.22', isCredit: false, month: 'September 2026' },
-  { title: 'Vikas CH', subtitle: 'WDL TFR UPI/DR/509027891806/VIKAS CH/YESB/q311679753/UPI 0097691162095 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '3,400.00', balance: '13,92,139.22', isCredit: false, month: 'September 2026' },
+  { title: 'Mr Archana', subtitle: 'WDL TFR UPI/DR/508660462095/Mr archana/IDIB/7838953936/UPI 0097694162092 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '03/09/2026', amount: '20,500.00', isCredit: false, month: 'September 2026' },
+  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/657489321564/Air India SBI/R825607848/NEFT AT 00614 NEW DELHI', date: '02/09/2026', postDate: '02/09/2026', amount: '3,02,457.33', isCredit: true, month: 'September 2026' },
+  { title: 'Dinesh K', subtitle: 'WDL TFR UPI/DR/508728059523/DINESH K/BKID/q274255738/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '49,656.00', isCredit: false, month: 'September 2026' },
+  { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508739893393/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '4,000.00', isCredit: false, month: 'September 2026' },
+  { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508749980074/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '35,200.00', isCredit: false, month: 'September 2026' },
+  { title: 'Akanksha', subtitle: 'WDL TFR UPI/DR/508709195394/akanksha/ICIC/akankshash/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '500.00', isCredit: false, month: 'September 2026' },
+  { title: 'Rishabh', subtitle: 'WDL TFR UPI/DR/508700699588/rishabht/ICIC/rishabhtri/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '1,000.00', isCredit: false, month: 'September 2026' },
+  { title: 'Ms Sonia', subtitle: 'WDL TFR UPI/DR/545432776302/Ms SONIA/CBIN/sonia.onep/UPI 0097696162090 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '290.00', isCredit: false, month: 'September 2026' },
+  { title: 'Ms Sonia', subtitle: 'WDL TFR UPI/DR/509045593850/Ms SONIA/CBIN/sonia.onep/UPI 0097691162095 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '1,800.00', isCredit: false, month: 'September 2026' },
+  { title: 'Vikas CH', subtitle: 'WDL TFR UPI/DR/509027891806/VIKAS CH/YESB/q311679753/UPI 0097691162095 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '3,400.00', isCredit: false, month: 'September 2026' },
 
   // August 2026
-  { title: 'Apple Media Services', subtitle: 'DEP TFR UPI/CR/102209673166/APPLE ME/HDFC/appleservi/Mand 0097738162095 AT 00614 NARAINGARH', date: '13/08/2026', postDate: '13/08/2026', amount: '289.00', balance: '12,02,644.69', isCredit: true, month: 'August 2026' },
-  { title: 'Apple Media Services', subtitle: 'WDL TFR UPI/DR/102194712169/APPLE ME/HDFC/appleservi/UPI 0097694162092 AT 00614 NARAINGARH', date: '11/08/2026', postDate: '11/08/2026', amount: '289.00', balance: '12,02,355.69', isCredit: false, month: 'August 2026' },
-  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/653245127852/Air India/SBI/462587496/NEFT AT 00614 NEW DELHI', date: '01/08/2026', postDate: '01/08/2026', amount: '2,78,390.18', balance: '12,02,644.69', isCredit: true, month: 'August 2026' },
+  { title: 'Apple Media Services', subtitle: 'DEP TFR UPI/CR/102209673166/APPLE ME/HDFC/appleservi/Mand 0097738162095 AT 00614 NARAINGARH', date: '13/08/2026', postDate: '13/08/2026', amount: '289.00', isCredit: true, month: 'August 2026' },
+  { title: 'Apple Media Services', subtitle: 'WDL TFR UPI/DR/102194712169/APPLE ME/HDFC/appleservi/UPI 0097694162092 AT 00614 NARAINGARH', date: '11/08/2026', postDate: '11/08/2026', amount: '289.00', isCredit: false, month: 'August 2026' },
+  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/653245127852/Air India/SBI/462587496/NEFT AT 00614 NEW DELHI', date: '01/08/2026', postDate: '01/08/2026', amount: '2,78,390.18', isCredit: true, month: 'August 2026' },
 
   // July 2026
-  { title: 'Rishabh (IMPS)', subtitle: 'DEP TFR IMPS/533421787598/ICI-XX138-RISHABH /IMPS Tran 0098333162095 AT 00614 NARAINGARH', date: '30/07/2026', postDate: '30/07/2026', amount: '599.49', balance: '9,24,254.51', isCredit: false, month: 'July 2026' },
-  { title: 'Gopal GU', subtitle: 'WDL TFR UPI/DR/392363227492/GOPAL GU/YESB/q013228365/Sent 0097690162095 AT 00614 NARAINGARH', date: '16/07/2026', postDate: '16/07/2026', amount: '600.00', balance: '9,24,854.00', isCredit: false, month: 'July 2026' },
-  { title: 'Gopal GU', subtitle: 'WDL TFR UPI/DR/392338526402/GOPAL GU/YESB/q013228365/Sent 0097696162090 AT 00614 NARAINGARH', date: '15/07/2026', postDate: '15/07/2026', amount: '650.00', balance: '9,25,454.00', isCredit: false, month: 'July 2026' },
-  { title: 'Shatrudh', subtitle: 'WDL TFR UPI/DR/531924227253/SHATRUDH/YESB/paytmqr6ir/Sent 0097696162090 AT 00614 NARAINGARH', date: '15/07/2026', postDate: '15/07/2026', amount: '725.03', balance: '9,26,104.00', isCredit: false, month: 'July 2026' },
-  { title: 'Mr Gopal', subtitle: 'WDL TFR UPI/DR/531731352838/Mr GOPAL/UTIB/9818858918/Sent 0097694162092 AT 00614 NARAINGARH', date: '13/07/2026', postDate: '13/07/2026', amount: '775.04', balance: '9,26,829.03', isCredit: false, month: 'July 2026' },
-  { title: 'Surjit K', subtitle: 'WDL TFR UPI/DR/392189657182/Surjit K/PPIW/surjit.yad/Sent 0097694162092 AT 00614 NARAINGARH', date: '13/07/2026', postDate: '13/07/2026', amount: '825.00', balance: '9,27,604.34', isCredit: false, month: 'July 2026' },
-  { title: 'Mr Mohan', subtitle: 'WDL TFR UPI/DR/531610331242/Mr MOHAN/YESB/q576682970/Sent 0097693162093 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '875.02', balance: '9,28,429.34', isCredit: false, month: 'July 2026' },
-  { title: 'Apple Media Services', subtitle: 'DEP TFR UPI/CR/101951563261/APPLE ME/HDFC/appleservi/Mand 0097735162098 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '950.50', balance: '9,29,304.36', isCredit: false, month: 'July 2026' },
-  { title: 'Apple Media Services', subtitle: 'WDL TFR UPI/DR/101951356609/APPLE ME/HDFC/appleservi/UPI 0097693162093 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '1,000.00', balance: '9,30,254.41', isCredit: false, month: 'July 2026' },
-  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/684593127486/Air India/SBI/563214796/NEFT AT 00614 NEW DELHI', date: '03/07/2026', postDate: '10/07/2026', amount: '2,87,116.66', balance: '9,31,254.41', isCredit: true, month: 'July 2026' },
+  { title: 'Rishabh (IMPS)', subtitle: 'DEP TFR IMPS/533421787598/ICI-XX138-RISHABH /IMPS Tran 0098333162095 AT 00614 NARAINGARH', date: '30/07/2026', postDate: '30/07/2026', amount: '599.49', isCredit: true, month: 'July 2026' },
+  { title: 'Gopal GU', subtitle: 'WDL TFR UPI/DR/392363227492/GOPAL GU/YESB/q013228365/Sent 0097690162095 AT 00614 NARAINGARH', date: '16/07/2026', postDate: '16/07/2026', amount: '600.00', isCredit: false, month: 'July 2026' },
+  { title: 'Gopal GU', subtitle: 'WDL TFR UPI/DR/392338526402/GOPAL GU/YESB/q013228365/Sent 0097696162090 AT 00614 NARAINGARH', date: '15/07/2026', postDate: '15/07/2026', amount: '650.00', isCredit: false, month: 'July 2026' },
+  { title: 'Shatrudh', subtitle: 'WDL TFR UPI/DR/531924227253/SHATRUDH/YESB/paytmqr6ir/Sent 0097696162090 AT 00614 NARAINGARH', date: '15/07/2026', postDate: '15/07/2026', amount: '725.03', isCredit: false, month: 'July 2026' },
+  { title: 'Mr Gopal', subtitle: 'WDL TFR UPI/DR/531731352838/Mr GOPAL/UTIB/9818858918/Sent 0097694162092 AT 00614 NARAINGARH', date: '13/07/2026', postDate: '13/07/2026', amount: '775.04', isCredit: false, month: 'July 2026' },
+  { title: 'Surjit K', subtitle: 'WDL TFR UPI/DR/392189657182/Surjit K/PPIW/surjit.yad/Sent 0097694162092 AT 00614 NARAINGARH', date: '13/07/2026', postDate: '13/07/2026', amount: '825.00', isCredit: false, month: 'July 2026' },
+  { title: 'Mr Mohan', subtitle: 'WDL TFR UPI/DR/531610331242/Mr MOHAN/YESB/q576682970/Sent 0097693162093 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '875.02', isCredit: false, month: 'July 2026' },
+  { title: 'Apple Media Services', subtitle: 'DEP TFR UPI/CR/101951563261/APPLE ME/HDFC/appleservi/Mand 0097735162098 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '950.50', isCredit: true, month: 'July 2026' },
+  { title: 'Apple Media Services', subtitle: 'WDL TFR UPI/DR/101951356609/APPLE ME/HDFC/appleservi/UPI 0097693162093 AT 00614 NARAINGARH', date: '12/07/2026', postDate: '12/07/2026', amount: '1,000.00', isCredit: false, month: 'July 2026' },
+  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/684593127486/Air India/SBI/563214796/NEFT AT 00614 NEW DELHI', date: '03/07/2026', postDate: '10/07/2026', amount: '2,87,116.66', isCredit: true, month: 'July 2026' },
 
   // June 2026
-  { title: 'Sushila', subtitle: 'WDL TFR UPI/DR/527769922823/SUSHILAD/YESB/q312456890/Sent 0097691162095 AT 00614 NARAINGARH', date: '04/06/2026', postDate: '04/06/2026', amount: '95,728.05', balance: '6,44,137.75', isCredit: false, month: 'June 2026' },
-  { title: 'Chandan', subtitle: 'WDL TFR UPI/DR/527769096810/CHANDAN/FDRL/9315873397/Sent 0097691162095 AT 00614 NARAINGARH', date: '04/06/2026', postDate: '04/06/2026', amount: '115.00', balance: '7,39,866.25', isCredit: false, month: 'June 2026' },
-  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/400596843278/Air India/SBI/796548213/NEFT AT 00614 NEW DELHI', date: '01/06/2026', postDate: '01/06/2026', amount: '3,55,116.66', balance: '7,39,981.25', isCredit: true, month: 'June 2026' },
+  { title: 'Sushila', subtitle: 'WDL TFR UPI/DR/527769922823/SUSHILAD/YESB/q312456890/Sent 0097691162095 AT 00614 NARAINGARH', date: '04/06/2026', postDate: '04/06/2026', amount: '95,728.05', isCredit: false, month: 'June 2026' },
+  { title: 'Chandan', subtitle: 'WDL TFR UPI/DR/527769096810/CHANDAN/FDRL/9315873397/Sent 0097691162095 AT 00614 NARAINGARH', date: '04/06/2026', postDate: '04/06/2026', amount: '115.00', isCredit: false, month: 'June 2026' },
+  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/400596843278/Air India/SBI/796548213/NEFT AT 00614 NEW DELHI', date: '01/06/2026', postDate: '01/06/2026', amount: '3,55,116.66', isCredit: true, month: 'June 2026' },
 ];
+// History is newest first; each row shows the balance after that transaction.
+let precedingBalancePaise = CURRENT_BALANCE_PAISE;
+const PDF_TRANSACTIONS: Transaction[] = TRANSACTION_HISTORY.map(transaction => {
+  const balance = formatPaise(precedingBalancePaise);
+  const amountPaise = parsePaise(transaction.amount);
+  precedingBalancePaise += transaction.isCredit ? -amountPaise : amountPaise;
+  return { ...transaction, balance };
+});
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('splash');
@@ -492,7 +512,7 @@ export default function App() {
           <View style={styles.inputCard}>
             <Text style={styles.fieldLabel}>Paying From</Text>
             <Text style={styles.fromAccountText}>SBI Savings A/C • {transferFromAccount}</Text>
-            <Text style={styles.fromAccountSub}>Available Balance: ₹15,17,342.09</Text>
+            <Text style={styles.fromAccountSub}>Available Balance: ₹{CURRENT_BALANCE}</Text>
           </View>
 
           <TouchableOpacity
@@ -888,16 +908,18 @@ export default function App() {
           <View style={styles.accountSelectorCard}>
             <Text style={styles.selectAccountLabel}>Select Account</Text>
             <View style={styles.accountBox}>
-              <View style={styles.sbiIconCircle}>
-                <SbiLogo size="small" dark />
-              </View>
+              <Image
+                source={{ uri: 'https://i.ibb.co/LdfV1v2s/BED36544-95-E4-4-A45-92-DD-02739-BEAA96-B-1-201-a.jpg' }}
+                style={styles.accountProfilePicture}
+                accessibilityLabel="Account holder profile picture"
+              />
               <View style={styles.flex1}>
                 <View style={styles.row}>
                   <Text style={styles.accountNumber}>41935162249</Text>
                   <Ionicons name="eye-outline" size={18} color="#555" style={styles.ml10} />
                 </View>
                 <Text style={styles.accountType}>SBI REGULAR SB CHQ-INDIVIDUALS (NARAINGARH)</Text>
-                <Text style={styles.availableBalanceLabel}>Clear Balance: <Text style={styles.bold}>₹15,17,342.09CR</Text></Text>
+                <Text style={styles.availableBalanceLabel}>Clear Balance: <Text style={styles.bold}>₹{CURRENT_BALANCE} CR</Text></Text>
               </View>
               <Ionicons name="chevron-down" size={22} color="#555" />
             </View>
@@ -1001,7 +1023,7 @@ export default function App() {
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.dashScrollContent}>
           <View style={styles.dashTabs}>
-            <Text style={[styles.dashTabActive, styles.dashTabText]}>Banking</Text>
+            <Text style={[styles.dashTabText, styles.dashTabActive]}>Banking</Text>
             <Text style={styles.dashTabText}>Lifestyle</Text>
             <Text style={styles.dashTabText}>YONO Pay</Text>
           </View>
@@ -1017,7 +1039,7 @@ export default function App() {
                </View>
                <Text style={styles.cardSub}>Clear Balance</Text>
                <View style={styles.rowBetween}>
-                 <Text style={styles.balanceText}>{showBalance ? '₹15,17,342.09' : 'XXXX,XXXX.XX'}</Text>
+                 <Text style={styles.balanceText} numberOfLines={1} adjustsFontSizeToFit>{showBalance ? `₹${CURRENT_BALANCE}` : 'XXXX,XXXX.XX'}</Text>
                  <TouchableOpacity onPress={handleRefresh}>
                    <MaterialCommunityIcons name="refresh" size={24} color="#FFF" />
                  </TouchableOpacity>
@@ -1354,7 +1376,7 @@ const styles = StyleSheet.create({
   viewBalanceText: { color: '#FFF', fontWeight: 'bold', fontSize: 15 },
   
   // Tab Section
-  tabSection: { flex: 1, backgroundColor: '#FFF', marginTop: 20, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20 },
+  tabSection: { flex: 1, backgroundColor: '#FFF', marginTop: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 20 },
   tabHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20, paddingHorizontal: 10 },
   tabText: { color: '#999', fontSize: 15, fontWeight: '500' },
   tabTextActive: { color: '#70006B', fontSize: 15, fontWeight: 'bold' },
@@ -1383,14 +1405,14 @@ const styles = StyleSheet.create({
   dashGreetingLight: { fontSize: 16, color: '#FFF' },
   dashSubLight: { fontSize: 12, color: 'rgba(255,255,255,0.8)' },
   headerIcon: { marginRight: 15 },
-  dashTabs: { flexDirection: 'row', paddingHorizontal: 20, marginVertical: 14 },
+  dashTabs: { flexDirection: 'row', paddingHorizontal: 20, paddingTop: 18, paddingBottom: 10, marginBottom: 16, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#EAE4EC' },
   dashTabText: { fontSize: 15, color: '#777', marginRight: 25, fontWeight: '500' },
   dashTabActive: { color: '#70006B', fontWeight: 'bold', borderBottomWidth: 2.5, borderBottomColor: '#70006B', paddingBottom: 4 },
   cardScroll: { paddingLeft: 20, marginBottom: 18 },
-  bankCard: { width: width * 0.78, borderRadius: 20, padding: 20, marginRight: 15, height: 165, elevation: 3 },
+  bankCard: { width: Math.min(width - 40, 420), borderRadius: 12, padding: 20, marginRight: 15, height: 180, elevation: 3 },
   cardTitle: { color: '#FFF', fontSize: 10.5, opacity: 0.85, fontWeight: '700', letterSpacing: 0.5 },
   cardSub: { color: '#FFF', fontSize: 12, marginTop: 14, opacity: 0.9 },
-  balanceText: { color: '#FFF', fontSize: 24, fontWeight: 'bold', marginTop: 2 },
+  balanceText: { color: '#FFF', fontSize: 26, fontWeight: '700', marginTop: 4, fontVariant: ['tabular-nums'] },
   cardLink: { color: '#FFF', textDecorationLine: 'underline', fontSize: 13, fontWeight: '600' },
   investCard: { width: width * 0.55, backgroundColor: '#FFF', borderRadius: 20, padding: 20, marginRight: 20, height: 165, borderWidth: 1, borderColor: '#EBE5EC', elevation: 2 },
   investTitle: { fontSize: 11, color: '#70006B', fontWeight: '700', letterSpacing: 0.5 },
@@ -1399,7 +1421,7 @@ const styles = StyleSheet.create({
   refreshText: { color: '#70006B', marginTop: 12, fontWeight: '600', fontSize: 14 },
 
   dashScrollContent: { paddingBottom: 10 },
-  paySection: { padding: 20, backgroundColor: '#FFF', borderTopLeftRadius: 28, borderTopRightRadius: 28, marginTop: 4, paddingBottom: 24 },
+  paySection: { padding: 20, backgroundColor: '#FFF', borderTopLeftRadius: 16, borderTopRightRadius: 16, marginTop: 4, paddingBottom: 24 },
   sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#2B0830', marginBottom: 14 },
   subTabRow: { flexDirection: 'row', marginBottom: 18 },
   subTabActive: { color: '#70006B', fontWeight: 'bold', marginRight: 20, borderBottomWidth: 2, borderBottomColor: '#70006B', paddingBottom: 2 },
@@ -1409,7 +1431,7 @@ const styles = StyleSheet.create({
   activateText: { color: '#70006B', fontWeight: 'bold', fontSize: 12 },
   upiGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
   dashGridItem: { width: '23%', alignItems: 'center', marginBottom: 16 },
-  dashIconCircle: { width: 48, height: 48, borderRadius: 14, backgroundColor: '#F5EBF7', justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
+  dashIconCircle: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#F5EBF7', justifyContent: 'center', alignItems: 'center', marginBottom: 6 },
   dashGridLabel: { fontSize: 10.5, textAlign: 'center', color: '#555', fontWeight: '500', minHeight: 28, lineHeight: 13.5 },
   bottomNavDash: { flexDirection: 'row', height: 75, backgroundColor: '#FFF', borderTopWidth: 1, borderColor: '#EFEFEF', paddingBottom: 8, alignItems: 'center' },
   fabContainerDash: { flex: 1, alignItems: 'center', marginTop: -24 },
@@ -1428,6 +1450,7 @@ const styles = StyleSheet.create({
   accountSelectorCard: { margin: 15, backgroundColor: '#FFF', borderRadius: 14, padding: 16, borderWidth: 1, borderColor: '#E6D8EC', elevation: 2 },
   selectAccountLabel: { fontSize: 12, color: '#777', marginBottom: 8, fontWeight: '600' },
   accountBox: { flexDirection: 'row', alignItems: 'center' },
+  accountProfilePicture: { width: 44, height: 44, borderRadius: 22, marginRight: 12, borderWidth: 1, borderColor: '#E6D8EC', backgroundColor: '#F5EBF7' },
   sbiIconCircle: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#70006B', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   sbiMiniLogo: { width: 24, height: 24 },
   accountNumber: { fontSize: 17, fontWeight: 'bold', color: '#2B0830' },
@@ -1449,8 +1472,8 @@ const styles = StyleSheet.create({
   transTitle: { fontSize: 14, color: '#222', fontWeight: '700', lineHeight: 19 },
   transSubtitle: { fontSize: 10.5, color: '#666', marginTop: 2, lineHeight: 14 },
   transDate: { fontSize: 11, color: '#888', marginTop: 4 },
-  transAmount: { fontSize: 15, fontWeight: 'bold' },
-  transBalance: { fontSize: 11, color: '#777', marginTop: 4 },
+  transAmount: { fontSize: 15, fontWeight: 'bold', fontVariant: ['tabular-nums'] },
+  transBalance: { fontSize: 11, color: '#777', marginTop: 4, fontVariant: ['tabular-nums'] },
   alignEnd: { alignItems: 'flex-end' },
   
   // Request Statement
