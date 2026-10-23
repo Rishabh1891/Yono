@@ -1,13 +1,17 @@
-# Welcome to your Expo app 👋
+# YONO SBI UI
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This project uses Expo SDK 58, React Native 0.88, and React 19.3. Dependencies are aligned with Expo's SDK 58 compatibility recommendations and recorded in `package-lock.json`.
+
+Use Node.js 22.13+, 24.3+, or 26.x within the supported even-numbered release lines. After upgrading from SDK 57, restart Metro with `npx expo start --clear` and rebuild any native development client. Existing SDK 57 clients cannot load the SDK 58 native modules.
+
+See the [SDK 58 release notes](https://expo.dev/changelog/sdk-58) and [Router migration guide](https://docs.expo.dev/router/migrate/sdk-57-to-58/). Web exports remain static. Native safe areas use `react-native-safe-area-context`; web safe areas use CSS browser insets to preserve streamed route hydration.
 
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   npm ci
    ```
 
 2. Start the app
@@ -23,7 +27,7 @@ In the output, you'll find options to open the app in a
 - [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
 ## Get a fresh project
 
