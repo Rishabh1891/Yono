@@ -64,7 +64,7 @@ const parsePaise = (amount: string) => {
 const TRANSACTION_HISTORY: Omit<Transaction, 'balance'>[] = [
   // September 2026 (Statement Batch)
   { title: 'Mr Archana', subtitle: 'WDL TFR UPI/DR/508660462095/Mr archana/IDIB/7838953936/UPI 0097694162092 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '03/09/2026', amount: '20,500.00', isCredit: false, month: 'September 2026' },
-  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/657489321564/Air India SBI/R825607848/NEFT AT 00614 NEW DELHI', date: '02/09/2026', postDate: '02/09/2026', amount: '3,02,457.33', isCredit: true, month: 'September 2026' },
+  { title: 'Air India', subtitle: 'DEP TFR NEFT/DR/657489321564/Air India SBI/R825607848/NEFT AT 00614 NEW DELHI', date: '02/09/2026', postDate: '02/09/2026', amount: '2,86,802.24', isCredit: true, month: 'September 2026' },
   { title: 'Dinesh K', subtitle: 'WDL TFR UPI/DR/508728059523/DINESH K/BKID/q274255738/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '49,656.00', isCredit: false, month: 'September 2026' },
   { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508739893393/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '4,000.00', isCredit: false, month: 'September 2026' },
   { title: 'Bishwaji', subtitle: 'WDL TFR UPI/DR/508749980074/Bishwaji/SBIN/9958026679/UPI 0097695162091 AT 00614 NARAINGARH', date: '02/09/2026', postDate: '02/09/2026', amount: '35,200.00', isCredit: false, month: 'September 2026' },
@@ -119,7 +119,8 @@ const datedStatementTransactions = statementTransactions.map(transaction => {
 const orderedTransactions = [...TRANSACTION_HISTORY, ...datedStatementTransactions]
   .sort((a, b) => transactionDate(b.date) - transactionDate(a.date));
 
-// Each row shows its balance after the transaction in the new date order.
+// Anchor the closing balance and work backward in paise. Editing a historical
+// amount recalculates earlier running balances and the implied opening balance.
 let precedingBalancePaise = CURRENT_BALANCE_PAISE;
 const PDF_TRANSACTIONS: Transaction[] = orderedTransactions.map(transaction => {
   const balance = formatPaise(precedingBalancePaise);
