@@ -34,7 +34,7 @@ export function SpendAnalysis({ transactions }: { transactions: Entry[] }) {
       </View>)}
       {top.length === 0 && <Text style={s.caption}>No outgoing payments for this month.</Text>}
     </View>
-    <View style={s.note}><Ionicons name="information-circle-outline" size={18} color={c.purple} /><Text style={s.noteText}>Calculated from the transactions in your demo passbook.</Text></View>
+    <View style={s.note}><Ionicons name="information-circle-outline" size={18} color={c.purple} /><Text style={s.noteText}>Calculated from the transactions in your passbook.</Text></View>
   </View>;
 }
 

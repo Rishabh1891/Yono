@@ -315,7 +315,7 @@ function YonoApp() {
     );
   }
 
-  // --- FUND TRANSFER DEMO FLOW ---
+  // --- FUND TRANSFER FLOW ---
   if (currentScreen === 'fundTransfer') {
     return (
       <SafeAreaView style={styles.dashboardContainer}>
@@ -325,13 +325,13 @@ function YonoApp() {
             <Ionicons name="chevron-back" size={26} color="#663399" />
           </TouchableOpacity>
           <Text style={styles.headerTitleLight}>Fund Transfer</Text>
-          <View style={styles.demoPill}><Text style={styles.demoPillText}>View All</Text></View>
+          <View style={styles.statusPill}><Text style={styles.statusPillText}>View All</Text></View>
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.transferScroll}>
-          <View style={styles.demoNotice}>
+          <View style={styles.infoNotice}>
             <Ionicons name="information-circle" size={20} color="#663399" />
-            <Text style={styles.demoNoticeText}>Transfer to a saved payee, or make a quick payment.</Text>
+            <Text style={styles.infoNoticeText}>Transfer to a saved payee, or make a quick payment.</Text>
           </View>
 
           <Text style={styles.sectionTitle}>Payments & Transfers</Text>
@@ -376,13 +376,13 @@ function YonoApp() {
             <Ionicons name="chevron-back" size={26} color="#663399" />
           </TouchableOpacity>
           <Text style={styles.headerTitleLight} numberOfLines={1}>{selectedRecipient.name}</Text>
-          <View style={styles.demoPill}><Text style={styles.demoPillText}>Payee</Text></View>
+          <View style={styles.statusPill}><Text style={styles.statusPillText}>Payee</Text></View>
         </View>
 
         <ScrollView contentContainerStyle={styles.transferScroll}>
-          <View style={styles.demoNotice}>
+          <View style={styles.infoNotice}>
             <Ionicons name="shield-checkmark" size={20} color="#663399" />
-            <Text style={styles.demoNoticeText}>Payees with inactive bank accounts are not eligible for transfers.</Text>
+            <Text style={styles.infoNoticeText}>Payees with inactive bank accounts are not eligible for transfers.</Text>
           </View>
 
           <View style={styles.payeeCard}>
@@ -420,7 +420,7 @@ function YonoApp() {
             <Ionicons name="chevron-back" size={26} color="#663399" />
           </TouchableOpacity>
           <Text style={styles.headerTitleLight}>Enter Amount</Text>
-          <View style={styles.demoPill}><Text style={styles.demoPillText}>Step 1 of 2</Text></View>
+          <View style={styles.statusPill}><Text style={styles.statusPillText}>Step 1 of 2</Text></View>
         </View>
 
         <ScrollView contentContainerStyle={styles.transferScroll}>
@@ -513,7 +513,7 @@ function YonoApp() {
             <Ionicons name="chevron-back" size={26} color="#663399" />
           </TouchableOpacity>
           <Text style={styles.headerTitleLight}>Verify Transfer</Text>
-          <View style={styles.demoPill}><Text style={styles.demoPillText}>Step 2 of 2</Text></View>
+          <View style={styles.statusPill}><Text style={styles.statusPillText}>Step 2 of 2</Text></View>
         </View>
 
         <ScrollView contentContainerStyle={styles.transferScroll}>
@@ -544,9 +544,9 @@ function YonoApp() {
             </View>
           </View>
 
-          <View style={styles.demoNotice}>
+          <View style={styles.infoNotice}>
             <Ionicons name="information-circle" size={20} color="#663399" />
-            <Text style={styles.demoNoticeText}>Check the recipient and amount before confirming your transfer.</Text>
+            <Text style={styles.infoNoticeText}>Check the recipient and amount before confirming your transfer.</Text>
           </View>
 
           <View style={styles.reviewButtons}>
@@ -571,7 +571,7 @@ function YonoApp() {
             <Ionicons name="chevron-back" size={26} color="#663399" />
           </TouchableOpacity>
           <Text style={styles.headerTitleLight}>mPIN Authorization</Text>
-          <View style={styles.demoPill}><Text style={styles.demoPillText}>Security</Text></View>
+          <View style={styles.statusPill}><Text style={styles.statusPillText}>Security</Text></View>
         </View>
 
         <View style={styles.mpinTransferContainer}>
@@ -611,7 +611,7 @@ function YonoApp() {
         <View style={styles.progressInner}>
           <ActivityIndicator size="large" color="#00B2E3" />
           <Text style={styles.progressTitle}>Transaction Processing...</Text>
-          <Text style={styles.progressSubtitle}>Preparing your demo transfer</Text>
+          <Text style={styles.progressSubtitle}>Preparing your transfer</Text>
 
           <View style={styles.progressTimeline}>
             <View style={styles.progressTimelineRow}>
@@ -683,9 +683,9 @@ function YonoApp() {
             </View>
           </View>
 
-          <View style={styles.demoNotice}>
+          <View style={styles.infoNotice}>
             <Ionicons name="checkmark-circle-outline" size={20} color="#2E7D32" />
-            <Text style={styles.demoNoticeText}>Demo transfer complete. No money has been moved.</Text>
+            <Text style={styles.infoNoticeText}>Simulation complete. No money has been moved.</Text>
           </View>
 
           <TouchableOpacity accessibilityRole="button"
@@ -1145,10 +1145,10 @@ const styles = StyleSheet.create({
 
   // Fund Transfer
   transferScroll: { padding: 18, paddingBottom: 40 },
-  demoPill: { backgroundColor: '#F0EAF6', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  demoPillText: { color: '#663399', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
-  demoNotice: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0EAF6', borderRadius: 12, padding: 12, marginBottom: 18 },
-  demoNoticeText: { flex: 1, color: '#492273', fontSize: 11.5, marginLeft: 8, lineHeight: 16 },
+  statusPill: { backgroundColor: '#F0EAF6', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  statusPillText: { color: '#663399', fontSize: 10, fontWeight: '800', letterSpacing: 0.8 },
+  infoNotice: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0EAF6', borderRadius: 12, padding: 12, marginBottom: 18 },
+  infoNoticeText: { flex: 1, color: '#492273', fontSize: 11.5, marginLeft: 8, lineHeight: 16 },
   transferOptionGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 4 },
   transferOption: { width: '23%', minHeight: 124, alignItems: 'center', marginBottom: 16 },
   transferOptionIcon: { width: 56, height: 56, borderRadius: 16, backgroundColor: '#F0EAF6', borderWidth: 1, borderColor: '#EAE6EF', justifyContent: 'center', alignItems: 'center', marginBottom: 8 },

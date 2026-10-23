@@ -58,7 +58,7 @@ export function LoginScreen({ mpin, onMpinChange, inputRef, error }: {
           <View style={s.flex}><Text style={s.bannerEyebrow}>YOU ONLY NEED ONE</Text><Text style={s.bannerTitle}>A little simpler. A lot more you.</Text><Text style={s.bannerSub}>Bank. Pay. Invest. All with YONO.</Text></View>
           <View style={s.bannerIcon}><Ionicons name="sparkles-outline" size={39} color={c.magenta} /></View>
         </LinearGradient>
-        <View style={s.secureFooter}><Ionicons name="lock-closed-outline" size={12} color={c.muted} /><Text style={s.footerText}>YONO SBI UI preview · Demo data</Text></View>
+        <View style={s.secureFooter}><Ionicons name="lock-closed-outline" size={12} color={c.muted} /><Text style={s.footerText}>You only need one.</Text></View>
       </ScrollView>
     </KeyboardAvoidingView>
     <View style={s.loginBottom}>
@@ -93,7 +93,7 @@ export function DashboardScreen({ balance, showBalance, toggleBalance, onPassboo
     { label: 'Investments', icon: 'trending-up-outline', onPress: () => preview.open('Investments') },
     { label: 'All Services', icon: 'grid-outline', onPress: () => preview.open('All Services', 'Explore fund transfers, account passbook and statement requests from the dashboard. Other banking services require the official YONO SBI app.') },
   ];
-  const openProfile = () => preview.open('My profile', 'Rishabh Tripathi\nSBI Savings Account · •••• 2249\n\nThis profile uses the existing demo account data.');
+  const openProfile = () => preview.open('My profile', 'Rishabh Tripathi\nSBI Savings Account · •••• 2249');
   return <SafeAreaView style={s.page}>
     <StatusBar barStyle="dark-content" />
     <View style={s.topbar}>
@@ -136,7 +136,7 @@ export function DashboardScreen({ balance, showBalance, toggleBalance, onPassboo
           <View style={s.growthArt}><View style={[s.growthBar, { height: 35, backgroundColor: '#C1A0DC' }]} /><View style={[s.growthBar, { height: 59, backgroundColor: '#9B71C0' }]} /><View style={[s.growthBar, { height: 85, backgroundColor: c.purple }]} /><View style={s.growthCoin}><Text style={s.growthRupee}>₹</Text></View></View>
         </LinearGradient>
         {tab === 'Banking' && <View style={s.section}><View style={s.between}><Text style={s.sectionTitle}>Recent transactions</Text><Pressable accessibilityRole="button" style={s.textButton} onPress={onPassbook}><Text style={s.link}>View all</Text></Pressable></View>{recent.map((item, i) => <Pressable accessibilityRole="button" accessibilityLabel={`View ${item.title} in passbook`} key={`${item.date}-${i}`} onPress={onPassbook} style={s.recentRow}><View style={[s.recentIcon, item.isCredit && { backgroundColor: '#EBF6EF' }]}><Ionicons name={item.isCredit ? 'arrow-down' : 'arrow-up'} size={19} color={item.isCredit ? '#278053' : c.purple} /></View><View style={s.flex}><Text style={s.recentName} numberOfLines={1}>{item.title}</Text><Text style={s.recentDate}>{item.date}</Text></View><Text style={[s.recentAmount, item.isCredit && { color: '#278053' }]}>{item.isCredit ? '+' : '−'} ₹{item.amount}</Text></Pressable>)}</View>}
-        <View style={s.secureFooter}><Ionicons name="shield-checkmark-outline" color={c.purple} size={14} /><Text style={s.footerText}>YONO SBI UI preview · Demo data</Text></View>
+        <View style={s.secureFooter}><Ionicons name="shield-checkmark-outline" color={c.purple} size={14} /><Text style={s.footerText}>You only need one.</Text></View>
       </>}
     </ScrollView>
     <View style={s.bottomNav}>
